@@ -48,11 +48,11 @@ resource "aws_security_group" "main" {
   }
 }
 
-# Policy for use in Role
-resource "aws_iam_policy" "ecs_task_execution_policy" {
-  name   = "${var.project}-policy"
-  policy = file("./policy.json")
-}
+# # Policy for use in Role
+# resource "aws_iam_policy" "ecs_task_execution_policy" {
+#   name   = "${var.project}-policy"
+#   policy = file("./policy.json")
+# }
 
 # Create Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
