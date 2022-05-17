@@ -48,12 +48,6 @@ resource "aws_security_group" "main" {
   }
 }
 
-# # Policy for use in Role
-# resource "aws_iam_policy" "ecs_task_execution_policy" {
-#   name   = "${var.project}-policy"
-#   policy = file("./policy.json")
-# }
-
 # Create Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
   name               = "ECSTaskExecutionRole-${var.project}"
@@ -77,11 +71,6 @@ EOF
   tags               = var.tags
 }
 
-# resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_attachment" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = aws_iam_policy.ecs_task_execution_policy.arn
-# }
-
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
@@ -102,7 +91,7 @@ resource "aws_ecs_cluster" "main" {
 resource "aws_ecs_task_definition" "main" {
   family                   = var.project
   network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE", "EC2"]
+  requires_compatibilities = ["EC2"]
   cpu                      = var.cpu
   memory                   = var.memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
@@ -110,7 +99,9 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = <<DEFINITION
   [
     {
+      "cpu": ${var.cpu},
       "image": "${aws_ecr_repository.main.repository_url}:latest",
+      "memory": ${var.memory},
       "name": "${var.project}",
       "networkMode": "null",
       "portMappings": [
