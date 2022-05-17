@@ -110,8 +110,8 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = <<DEFINITION
   [
     {
-      "cpu": ${var.cpu},
       "image": "${aws_ecr_repository.main.repository_url}:latest",
+      "name": "${var.project}",
       "networkMode": "null",
       "portMappings": [
         {
