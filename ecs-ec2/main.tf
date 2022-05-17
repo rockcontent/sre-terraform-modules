@@ -112,8 +112,6 @@ resource "aws_ecs_task_definition" "main" {
     {
       "cpu": ${var.cpu},
       "image": "${aws_ecr_repository.main.repository_url}:latest",
-      "memory": ${var.memory},
-      "name": "${var.project}",
       "networkMode": "null",
       "portMappings": [
         {
