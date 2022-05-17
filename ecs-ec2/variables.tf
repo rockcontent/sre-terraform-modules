@@ -51,6 +51,11 @@ variable "subnets" {
   description = "Subnet 1 of the task"
 }
 
+variable "publicip" {	
+  type        = string	
+  description = "Assign public IP  1 of the task"	
+}
+
 variable "region" {
   type        = string
   description = "Region of the task"
