@@ -21,6 +21,11 @@ variable "project" {
   description = "Name of Project"
 }
 
+variable "cluster_name" {
+  type        =  string
+  description = "Name of Cluster ECS"
+}
+
 variable "sub_domain" {
   type        = string
   description = "Sub Domain App"

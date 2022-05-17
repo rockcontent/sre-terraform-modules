@@ -94,7 +94,7 @@ resource "aws_iam_role_policy_attachment" "secrets_manager_read_write" {
 
 # Create Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "${var.project}-cluster"
+  name = var.cluster_name
   tags = var.tags
 }
 
