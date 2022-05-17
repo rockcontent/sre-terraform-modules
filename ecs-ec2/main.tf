@@ -94,15 +94,15 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = <<DEFINITION
   [
     {
-      "cpu": ${var.cpu},
-      "image": "${aws_ecr_repository.main.repository_url}:latest",
-      "memory": ${var.memory},
       "name": "${var.project}",
-      "networkMode": "null",
+      "image": "${aws_ecr_repository.main.repository_url}:latest",
+      "cpu": ${var.cpu},
+      "memory": ${var.memory},
       "portMappings": [
         {
           "containerPort": ${var.app_port},
-          "hostPort": ${var.app_port}
+          "hostPort": ${var.app_port},
+          "protocol": "tcp"
         }
       ],
       "logConfiguration": {
