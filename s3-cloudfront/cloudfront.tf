@@ -91,9 +91,11 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  # tags = {
-  #   Environment = "production"
-  # }
+  tags = {
+    Environment = var.environment
+    product     = var.product
+    tribe       = var.tribe
+  }
 
   viewer_certificate {
     cloudfront_default_certificate = true
