@@ -11,27 +11,27 @@ variable "aliases" {
 }
 
 variable "environment" {
-  default = ""
+  default = "environment_value"
 }
 
 variable "product" {
-  default = ""
+  default = "product_value"
 }
 
 variable "tribe" {
-  default = ""
+  default = "tribe_value"
 }
 
 
 # AWS
 # -----------------------------------------------------------------------------
 variable "AWS_ACCESS_KEY" {
-  default = ""
+  default = "aws_access_key_value"
 }
 variable "AWS_SECRET_KEY" {
-  default = ""
+  default = "aws_secret_key_value"
 }
 
 variable "AWS_REGION" {
-  default = ""
+  default = "aws_region_value"
 }
