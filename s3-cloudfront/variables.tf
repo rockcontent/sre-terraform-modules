@@ -1,6 +1,6 @@
 # S3
 variable "bucket_prefix" {
-  default = ""
+  default = "bucket_prefix_value"
 }
 
 # CLOUDFRONT
