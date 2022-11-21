@@ -1,6 +1,6 @@
 # S3
 variable "bucket_prefix" {
-  default = "bucket_prefix_value"
+  default = ""
 }
 
 # CLOUDFRONT
@@ -11,27 +11,27 @@ variable "aliases" {
 }
 
 variable "environment" {
-  default = "environment_value"
+  default = ""
 }
 
 variable "product" {
-  default = "product_value"
+  default = ""
 }
 
 variable "tribe" {
-  default = "tribe_value"
+  default = ""
 }
 
 
 # AWS
 # -----------------------------------------------------------------------------
 variable "AWS_ACCESS_KEY" {
-  default = "aws_access_key_value"
+  default = ""
 }
 variable "AWS_SECRET_KEY" {
-  default = "aws_secret_key_value"
+  default = ""
 }
 
 variable "AWS_REGION" {
-  default = "aws_region_value"
+  default = ""
 }
