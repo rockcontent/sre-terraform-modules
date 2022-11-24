@@ -1,14 +1,20 @@
-resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_prefix
+# resource "aws_s3_bucket" "b" {
+#   bucket = var.bucket_prefix
 
-  tags = {
-    Name = "My bucket"
-  }
-}
+#   tags = {
+#     Name = "My bucket"
+#   }
+# }
 
-resource "aws_s3_bucket_acl" "b_acl" {
-  bucket = aws_s3_bucket.s3_bucket.id
-  acl    = "public-read"
+# resource "aws_s3_bucket_acl" "b_acl" {
+#   bucket = aws_s3_bucket.s3_bucket.id
+#   acl    = "public-read"
+# }
+
+data "aws_acm_certificate" "issued" {
+  domain   = var.ACM_CERTIFICATE
+  statuses = ["ISSUED"]
+  provider = var.AWS_REGION
 }
 
 locals {
