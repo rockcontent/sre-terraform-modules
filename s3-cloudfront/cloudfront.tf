@@ -1,14 +1,20 @@
-resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_prefix
+# resource "aws_s3_bucket" "b" {
+#   bucket = var.bucket_prefix
 
-  tags = {
-    Name = "My bucket"
-  }
-}
+#   tags = {
+#     Name = "My bucket"
+#   }
+# }
 
-resource "aws_s3_bucket_acl" "b_acl" {
-  bucket = aws_s3_bucket.s3_bucket.id
-  acl    = "public-read"
+# resource "aws_s3_bucket_acl" "b_acl" {
+#   bucket = aws_s3_bucket.s3_bucket.id
+#   acl    = "public-read"
+# }
+
+data "aws_acm_certificate" "issued" {
+  domain   = var.ACM_CERTIFICATE
+  statuses = ["ISSUED"]
+  provider = aws.virginia
 }
 
 locals {
@@ -39,7 +45,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_root_object = "index.html"
 
 
-  aliases = [var.aliases]
+  aliases = var.aliases
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -98,7 +104,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
+    acm_certificate_arn = data.aws_acm_certificate.issued.id
+    minimum_protocol_version = "TLSv1.1_2016"
+    ssl_support_method = "sni-only"
   }
 
   depends_on = [

@@ -22,6 +22,11 @@ variable "tribe" {
   default = ""
 }
 
+#ACM
+
+variable "ACM_CERTIFICATE" {
+  default = ""
+}
 
 # AWS
 # -----------------------------------------------------------------------------
