@@ -1,0 +1,61 @@
+name: 'IAC Terraform'
+
+on: [workflow_dispatch]
+
+permissions:
+  contents: read
+  
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash
+    
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Clone sre-terraform-modules
+      uses: actions/checkout@v3
+      with:
+        repository: rockcontent/sre-terraform-modules
+        path: .iac/terraform
+        ref: dev-ecs
+        token: ${{ secrets.TOKEN_sre_terraform_github }}
+
+    - name: Create Mutable NonProd Variables
+      run: |
+        export TF_VAR_PROJECT="${{ github.event.repository.name }}-${{ github.ref_name }}"
+
+    - name: Create Mutable Prod Variables
+      if: github.ref == 'refs/heads/main'
+      run: |
+        export TF_VAR_PROJECT="${{ github.event.repository.name }}-${{ github.ref_name }}"
+
+
+    - name: Terraform
+      uses: hashicorp/setup-terraform@v1
+      
+    - name: Terraform Init Dev
+      if: github.ref_name == 'dev'
+      run: |
+        cd .iac
+        ./variables-common.sh
+        ./variables-ion-dev-public.sh
+        ./variables-projectsample-dev.sh
+        #
+        terraform --version
+        terraform init \
+          --backend-config="key=${{ github.event.repository.name }}-${{ github.ref_name }}/terraform.tfstate" \
+          --backend-config="bucket=$TFBUCKETSTATE" \
+          --backend-config="region=$AWS_REGION"
+        terraform validate
+        terraform plan -out=tfplanfile
+        terraform apply -input=false "tfplanfile"
+
+
+

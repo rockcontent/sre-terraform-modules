@@ -1,18 +1,24 @@
+#############################
+#         ECR               #
+#############################
+
 # Create ECR Repository
 resource "aws_ecr_repository" "main" {
   name = var.project
+
   tags = var.tags
 }
 
 # Lifecycle policy
 resource "aws_ecr_lifecycle_policy" "main" {
   repository = aws_ecr_repository.main.name
+
   policy = <<EOF
 {
     "rules": [
         {
             "rulePriority": 1,
-            "description": "Keep last ${var.ecrretention} images",
+            "description": "Keep last ${var.ecrretention} of images",
             "selection": {
                 "tagStatus": "any",
                 "countType": "imageCountMoreThan",
@@ -27,30 +33,35 @@ resource "aws_ecr_lifecycle_policy" "main" {
 EOF
 }
 
+
+#############################
+#         Security          #
+#############################
+
 # Traffic to the ECS Cluster should only come from the ALB
-resource "aws_security_group" "main" {
-  name        = "${var.project}-task"
-  description = "allow inbound access from the ALB only"
-  vpc_id      = var.vpc
+#resource "aws_security_group" "main" {
+#  name        = "${var.project}-task"
+#  description = "allow inbound access from the ALB only"
+#  vpc_id      = var.vpc
 
-  ingress {
-    protocol        = "tcp"
-    from_port       = var.app_port
-    to_port         = var.app_port
-    security_groups = ["${var.securitygroup}"]
-  }
+#  ingress {
+#    protocol        = "tcp"
+#    from_port       = var.app_port
+#    to_port         = var.app_port
+#    security_groups = ["${var.securitygroup}"]
+#  }
 
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#  egress {
+#    protocol    = "-1"
+#    from_port   = 0
+#    to_port     = 0
+#    cidr_blocks = ["0.0.0.0/0"]
+#  }
+#}
 
 # Create Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "ECSTaskExecutionRole-${var.project}"
+  name               = "ECSTaskRole-${var.project}"
   assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -76,33 +87,27 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Create Cluster
-resource "aws_ecs_cluster" "main" {
-  name = var.cluster_name
-  tags = var.tags
-}
-
 # Create Task Definition
 resource "aws_ecs_task_definition" "main" {
   family                   = var.project
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
   cpu                      = var.cpu
   memory                   = var.memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
+
   container_definitions = <<DEFINITION
   [
     {
-      "name": "${var.project}",
-      "image": "${aws_ecr_repository.main.repository_url}:latest",
       "cpu": ${var.cpu},
+      "image": "${aws_ecr_repository.main.repository_url}:latest",
       "memory": ${var.memory},
+      "name": "${var.project}",
       "portMappings": [
         {
           "containerPort": ${var.app_port},
-          "hostPort": ${var.app_port},
-          "protocol": "tcp"
+          "hostPort": 0
         }
       ],
       "logConfiguration": {
@@ -130,15 +135,16 @@ resource "aws_cloudwatch_log_group" "main" {
 # Create Service
 resource "aws_ecs_service" "main" {
   name            = "${var.project}-service"
-  cluster         = aws_ecs_cluster.main.id
+  cluster         = var.cluster_name
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.min_capacity
   launch_type     = var.type_compatibility
 
-  network_configuration {
-    security_groups  = [aws_security_group.main.id]
-    subnets          = var.subnets
-  }
+#  network_configuration {
+#    security_groups  = [aws_security_group.main.id]
+#    subnets          = var.subnets
+#    assign_public_ip = var.publicip
+#  }
 
   load_balancer {
     target_group_arn = aws_alb_target_group.main.id
@@ -152,7 +158,7 @@ resource "aws_ecs_service" "main" {
 resource "aws_appautoscaling_target" "main" {
   max_capacity       = var.max_capacity
   min_capacity       = var.min_capacity
-  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.main.name}"
+  resource_id        = "service/${var.cluster_name}/${aws_ecs_service.main.name}"
   role_arn           = "arn:aws:iam::${var.accountid}:role/ecsAutoscaleRole"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
@@ -177,13 +183,19 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
   }
 }
 
+resource "random_string" "random" {
+  length           = 4
+  special          = false
+  lower            = true
+ }
 
 # Target Group to App
 resource "aws_alb_target_group" "main" {
+  name        = "${var.project}-${random_string.random.result}"
   port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = var.vpc
-  target_type = "ip"
+  target_type = "instance"
 
   health_check {
     interval            = var.tg-interval
@@ -214,4 +226,5 @@ resource "aws_lb_listener_rule" "main" {
       values = ["${var.sub_domain}"]
     }
   }
+
 }

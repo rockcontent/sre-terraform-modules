@@ -21,11 +21,6 @@ variable "project" {
   description = "Name of Project"
 }
 
-variable "cluster_name" {
-  type        =  string
-  description = "Name of Cluster ECS"
-}
-
 variable "sub_domain" {
   type        = string
   description = "Sub Domain App"
@@ -49,6 +44,11 @@ variable "loadbalancer" {
 variable "subnets" {
   type        = list(any)
   description = "Subnet 1 of the task"
+}
+
+variable "publicip" {
+  type        = string
+  description = "Assign public IP  1 of the task"
 }
 
 variable "region" {
@@ -139,4 +139,9 @@ variable "tg-unhealthy_threshold" {
 variable "type_compatibility" {
   type        = string
   description = "Type Compatibility EC2, FARGATE and EXTERNAL"
+}
+
+variable "cluster_name" {
+  type = string
+  description = "ECS Cluster"  
 }
