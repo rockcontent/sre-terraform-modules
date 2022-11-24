@@ -24,7 +24,7 @@ variable "tribe" {
 
 #ACM
 
-variables "ACM_CERTIFICATE" {
+variable "ACM_CERTIFICATE" {
   default = ""
 }
 
