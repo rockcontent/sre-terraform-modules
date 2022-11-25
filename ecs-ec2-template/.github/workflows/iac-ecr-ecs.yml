@@ -9,6 +9,25 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
+    - name: Export Variables
+      run: |
+        cd .iac
+        for i in $(`cat *common.var`); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+        done
+        if [ ${{ github.ref_name }} == "dev" ]; then 
+          for i in $(cat *-dev.var); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+          done
+        fi
+        if [ ${{ github.ref_name }} == "prod" ]; then 
+          for i in $(`cat *-prod.var`); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+          done
+        fi
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -27,26 +27,28 @@ jobs:
         ref: dev-ecs
         token: ${{ secrets.TOKEN_sre_terraform_github }}
 
-    - name: Create Mutable NonProd Variables
-      run: |
-        export TF_VAR_PROJECT="${{ github.event.repository.name }}-${{ github.ref_name }}"
-
-    - name: Create Mutable Prod Variables
-      if: github.ref == 'refs/heads/main'
-      run: |
-        export TF_VAR_PROJECT="${{ github.event.repository.name }}-${{ github.ref_name }}"
-
-
     - name: Terraform
       uses: hashicorp/setup-terraform@v1
       
     - name: Terraform Init Dev
-      if: github.ref_name == 'dev'
       run: |
         cd .iac
-        ./variables-common.sh
-        ./variables-ion-dev-public.sh
-        ./variables-projectsample-dev.sh
+        for i in $(`cat *common.var`); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+        done
+        if [ ${{ github.ref_name }} == "dev" ]; then 
+          for i in $(cat *-dev.var); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+          done
+        fi
+        if [ ${{ github.ref_name }} == "prod" ]; then 
+          for i in $(`cat *-prod.var`); do
+            export $i
+            echo `\'$i\'` >> $GITHUB_ENV
+          done
+        fi
         #
         terraform --version
         terraform init \
