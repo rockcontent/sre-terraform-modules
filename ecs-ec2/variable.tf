@@ -4,16 +4,28 @@ variable "tags" {
   default     = {}
 }
 
-variable "task_environment" {
-  type        = list(any)
-  description = "Task environment variables"
-  default     = []
+# variable "task_environment" {
+#   type        = list(any)
+#   description = "Task environment variables"
+#   default     = []
+# }
+
+# variable "task_secret" {
+#   type        = list(any)
+#   description = "Task environment secrets"
+#   default     = []
+# }
+
+variable "map_environment" {
+  type        = map(string)
+  description = "The environment variables to pass to the container. This is a map of string: {key: value}. map_environment overrides environment"
+  default     = null
 }
 
-variable "task_secret" {
-  type        = list(any)
-  description = "Task environment secrets"
-  default     = []
+variable "map_secrets" {
+  type        = map(string)
+  description = "The secrets variables to pass to the container. This is a map of string: {key: value}. map_secrets overrides secrets"
+  default     = null
 }
 
 variable "project" {

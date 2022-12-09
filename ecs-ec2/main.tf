@@ -118,8 +118,8 @@ resource "aws_ecs_task_definition" "main" {
           "awslogs-stream-prefix": "ecs"
         }
       },
-      "environment" : ${jsonencode(var.task_environment)},
-      "secrets": ${jsonencode(var.task_secret)}
+      "environment" : ${jsonencode(local.task_environment)},
+      "secrets": ${jsonencode(local.task_secret)}
     }
   ]
   DEFINITION
@@ -191,7 +191,7 @@ resource "random_string" "random" {
 
 # Target Group to App
 resource "aws_alb_target_group" "main" {
-  name        = "${substr(var.project, -25, -1)}-${random_string.random.result}"
+  name        = "${substr(var.project, -27, -1)}-${random_string.random.result}"
   port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = var.vpc
