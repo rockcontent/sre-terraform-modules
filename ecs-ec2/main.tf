@@ -191,7 +191,7 @@ resource "random_string" "random" {
 
 # Target Group to App
 resource "aws_alb_target_group" "main" {
-  name        = "trimprefix(substr(${var.project}, -25, -1), "-")-${random_string.random.result}"
+  name        = "${substr(var.project, -25, -1)}-${random_string.random.result}"
   port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = var.vpc
