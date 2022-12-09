@@ -184,14 +184,14 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
 }
 
 resource "random_string" "random" {
-  length           = 4
+  length           = 3
   special          = false
   lower            = true
  }
 
 # Target Group to App
 resource "aws_alb_target_group" "main" {
-  name        = "${var.project}-${random_string.random.result}"
+  name        = "trimprefix(substr(${var.project}, -25, -1), "-")-${random_string.random.result}"
   port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = var.vpc
