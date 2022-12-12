@@ -5,13 +5,13 @@ variable "tags" {
 }
 
 variable "task_environment" {
-  type        = map(any)
+  type        = list(string)
   description = "Task environment variables"
   default     = null
 }
 
 variable "task_secrets" {
-  type        = map(any)
+  type        = list(string)
   description = "Task environment secrets"
   default     = null
 }
