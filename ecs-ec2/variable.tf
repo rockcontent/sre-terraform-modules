@@ -5,15 +5,15 @@ variable "tags" {
 }
 
 variable "task_environment" {
-  type        = list
+  type        = list(any)
   description = "Task environment variables"
-  default     = []
+  default     = null
 }
 
 variable "task_secrets" {
-  type        = list
+  type        = list(any)
   description = "Task environment secrets"
-  default     = []
+  default     = null
 }
 
 
