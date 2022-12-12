@@ -5,15 +5,15 @@ variable "tags" {
 }
 
 variable "task_environment" {
-  type        = string
+  type        = list
   description = "Task environment variables"
-  default     = null
+  default     = []
 }
 
 variable "task_secrets" {
   type        = string
   description = "Task environment secrets"
-  default     = null
+  default     = []
 }
 
 
