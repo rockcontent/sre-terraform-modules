@@ -11,7 +11,7 @@ variable "task_environment" {
 }
 
 variable "task_secrets" {
-  type        = string
+  type        = list
   description = "Task environment secrets"
   default     = []
 }
