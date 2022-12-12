@@ -16,6 +16,12 @@ variable "task_secrets" {
   default     = null
 }
 
+variable "task_role" {
+  type        = list(any)
+  description = "Task environment variables"
+  default     = null
+}
+
 
 variable "project" {
   type        = string
