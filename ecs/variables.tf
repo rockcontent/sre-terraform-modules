@@ -2,10 +2,21 @@
 #------------------------------------------------------------------------------
 
 variable "cluster_name" {
-  type = string
+  default = ""
 }
 
-variable "cluster_tag" {
-  type = map
-  default = {}
+# AWS
+#------------------------------------------------------------------------------
+
+
+variable "aws_region" {
+  default = ""
+}
+
+variable "aws_access_key_id" {
+  default = ""
+}
+
+variable "aws_secret_key_id" {
+  default = ""
 }
