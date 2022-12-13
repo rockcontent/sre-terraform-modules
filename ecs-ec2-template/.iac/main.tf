@@ -22,6 +22,7 @@ module "ecs-module" {
   task_secrets            = var.SECRETSVAR
   task_environment        = var.ENVIRONMENTVAR
   task_role               = "${file("taskrole.json")}"
+  task_exec_role          = "${file("taskexecrole.json")}"
   #############################
   #      AWS environment      #
   #############################

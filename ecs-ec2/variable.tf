@@ -20,6 +20,10 @@ variable "task_role" {
   type        = string
   description = "Task environment variables"
 }
+variable "task_exec_role" {
+  type        = string
+  description = "Task environment variables"
+}
 
 
 variable "project" {
