@@ -17,9 +17,8 @@ variable "task_secrets" {
 }
 
 variable "task_role" {
-  type        = list(any)
+  type        = string
   description = "Task environment variables"
-  default     = null
 }
 
 
