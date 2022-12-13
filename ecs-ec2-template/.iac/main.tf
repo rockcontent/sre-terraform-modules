@@ -19,6 +19,9 @@ module "ecs-module" {
   tg-matcher              = var.TG_MATCHER
   tg-healthy_threshold    = var.TG_HEALTHY_THRESHOLD
   tg-unhealthy_threshold  = var.UNHEALTHY_THRESHOLD
+  task_secrets            = var.SECRETSVAR
+  task_environment        = var.ENVIRONMENTVAR
+  task_role               = "${file("taskrole.json")}"
   #############################
   #      AWS environment      #
   #############################
@@ -35,7 +38,8 @@ module "ecs-module" {
   logsretention           = var.LOGSRETENTION
   ecrretention            = var.ECRRETENTION
   type_compatibility      = var.TYPE_COMPATIBILITY
-  
+
+
   tags = {
     "branch"        = var.BRANCH
     "project"       = var.PROJECT

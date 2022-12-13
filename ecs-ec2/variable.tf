@@ -7,14 +7,20 @@ variable "tags" {
 variable "task_environment" {
   type        = list(any)
   description = "Task environment variables"
-  default     = []
+  default     = null
 }
 
-variable "task_secret" {
+variable "task_secrets" {
   type        = list(any)
   description = "Task environment secrets"
-  default     = []
+  default     = null
 }
+
+variable "task_role" {
+  type        = string
+  description = "Task environment variables"
+}
+
 
 variable "project" {
   type        = string

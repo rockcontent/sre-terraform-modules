@@ -13,7 +13,14 @@ jobs:
     defaults:
       run:
         shell: bash
-    
+    env:
+      TF_VAR_PROJECT: ${{ github.event.repository.name }}-${{ github.ref_name }}
+      TF_VAR_BRANCH: ${{ github.ref_name }}
+      ECR_REPOSITORY: ${{ github.event.repository.name }}-${{ github.ref_name }}
+      CONTAINER_NAME: ${{ github.event.repository.name }}-${{ github.ref_name }}
+      ECS_SERVICE: ${{ github.event.repository.name }}-${{ github.ref_name }}-service
+      ECS_TASK_DEFINITION: ${{ github.event.repository.name }}-${{ github.ref_name }}
+
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
@@ -24,32 +31,62 @@ jobs:
       with:
         repository: rockcontent/sre-terraform-modules
         path: .iac/terraform
-        ref: dev-ecs
+        ref: main
         token: ${{ secrets.TOKEN_sre_terraform_github }}
 
     - name: Terraform
       uses: hashicorp/setup-terraform@v1
-      
+
+    - name: Variables run
+      run: | 
+        cd .iac
+        oldIFS="$IFS"
+        IFS='
+        '
+        if [ ${{ github.ref_name }} == "master" ]; then
+
+          #TERRAFORM ENVIRONMENTS VARIABLES
+          for i in `cat *prod.var`; do
+              echo "$i" >> $GITHUB_ENV
+          done
+
+          #TASK ENVIRONMENT VARIABLES
+          echo 'TF_VAR_ENVIRONMENTVAR<<EOF' >> $GITHUB_ENV
+          echo '[' >> $GITHUB_ENV
+          for i in `cat prod.env`; do 
+            echo $i | awk -F= '{print "{"; print "\t\"name\" = " $1"," ; print "\t\"value\" = " $2 ; print "}," }' >> $GITHUB_ENV
+          done
+          #echo '{}' >> $GITHUB_ENV
+          echo ']' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          # TASK ENVIRONMENT SECRETS
+          echo 'TF_VAR_SECRETSVAR<<EOF' >> $GITHUB_ENV
+          echo '[' >> $GITHUB_ENV
+          for i in `cat prod.secrets`; do 
+             echo $i | awk -F= '{print "{"; print "\t\"name\" = " $1"," ; print "\t\"valueFrom\" = " $2 ; print "}," }' >> $GITHUB_ENV
+          done
+          #echo '{}' >> $GITHUB_ENV
+          echo ']' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          # AWS SECRET VARIABLES
+          echo TF_VAR_AWS_ACCESS_KEY=${{ secrets.STUDIO_PROD_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo TF_VAR_AWS_SECRET_KEY=${{ secrets.STUDIO_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY=${{ secrets.STUDIO_PROD_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo AWS_SECRET_KEY=${{ secrets.STUDIO_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
+
+        else
+
+          for i in `cat *dev.var`; do
+              echo "$i" >> $GITHUB_ENV
+          done
+        fi
+
     - name: Terraform Init Dev
       run: |
         cd .iac
-        for i in $(`cat *common.var`); do
-            export $i
-            echo `\'$i\'` >> $GITHUB_ENV
-        done
-        if [ ${{ github.ref_name }} == "dev" ]; then 
-          for i in $(cat *-dev.var); do
-            export $i
-            echo `\'$i\'` >> $GITHUB_ENV
-          done
-        fi
-        if [ ${{ github.ref_name }} == "prod" ]; then 
-          for i in $(`cat *-prod.var`); do
-            export $i
-            echo `\'$i\'` >> $GITHUB_ENV
-          done
-        fi
-        #
+
         terraform --version
         terraform init \
           --backend-config="key=${{ github.event.repository.name }}-${{ github.ref_name }}/terraform.tfstate" \
