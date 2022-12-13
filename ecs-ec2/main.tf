@@ -60,7 +60,7 @@ EOF
 #}
 
 # Create Role for ECS Task Execution
-resource "aws_iam_role" "ecs_task_execution_role" {
+resource "aws_iam_role" "ecs_task_exec_role" {
   name               = "ECSTaskExecRole-${var.project}"
   assume_role_policy = <<EOF
 {
@@ -82,11 +82,18 @@ EOF
   tags               = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_exec_role" {
+  role       = aws_iam_role.ecs_task_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+resource "aws_iam_role_policy" "ecs_task_exec_role_policy" {
+  name = "ExecRole-${var.project}"
+  role = aws_iam_role.ecs_task_exec_role.id
 
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = var.task_exec_role
+}
 # Create Role for ECS Task 
 resource "aws_iam_role" "ecs_task_role" {
   name               = "ECSTaskRole-${var.project}"
