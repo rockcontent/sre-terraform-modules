@@ -12,41 +12,43 @@ variable "image_id" {
   default = ""
 }
 
-variable "iam_instance_profile" {
-  default = ""
-}
+# variable "iam_instance_profile" {
+#   default = ""
+# }
 
-variable "key_pair" {
-  default = ""
-}
+# variable "key_pair" {
+#   default = ""
+# }
 
 # ECS AutoScaling
 #------------------------------------------------------------------------------
 
-variable "min_size" {
-  default = "0"
-}
+# variable "min_size" {
+#   default = "0"
+# }
 
-variable "max_size" {
-  default = "0"
-}
+# variable "max_size" {
+#   default = "0"
+# }
 
 variable "desired_capacity" {
-  default = "0"
+  default = 1
 }
 
-variable "whitelist" {
-  default = []
-}
+# variable "whitelist" {
+#   default = []
+# }
 
 # ECS Network
 #------------------------------------------------------------------------------
 
 variable "subnet_ids" {
+    type    = list(string)
     default = []
 }
 
 variable "security_group_ids" {
+    type    = list(string)
     default = []
 }
 
@@ -55,7 +57,7 @@ variable "security_group_ids" {
 #------------------------------------------------------------------------------
 
 variable "device_name" {
-  default = ""
+  default = "/dev/xvda"
 }
 
 variable "volume_size" {
@@ -76,3 +78,15 @@ variable "aws_access_key_id" {
 variable "aws_secret_key_id" {
   default = ""
 }
+
+# SPOTINST
+#------------------------------------------------------------------------------
+
+variable "spotinst_token" {
+  default = ""
+}
+
+variable "spotinst_account" {
+  default = ""
+}
+

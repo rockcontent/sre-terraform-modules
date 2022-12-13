@@ -3,18 +3,18 @@ resource "spotinst_ocean_ecs" "ecs_spot" {
     name = var.cluster_name
     cluster_name = var.cluster_name
 
-    min_size         = var.min_size
-    max_size         = var.max_size
+    # min_size         = var.min_size
+    # max_size         = var.max_size
     desired_capacity = var.desired_capacity
 
     subnet_ids = var.subnet_ids
-    whitelist = var.whitelist
+    # whitelist = var.whitelist
 
     security_group_ids = var.security_group_ids
     image_id = var.image_id
-    iam_instance_profile = var.iam_instance_profile
+    # iam_instance_profile = var.iam_instance_profile
 
-    key_pair = var.key_pair
+    # key_pair = var.key_pair
 
     associate_public_ip_address = false
     utilize_reserved_instances  = false
