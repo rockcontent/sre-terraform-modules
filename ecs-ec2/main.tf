@@ -121,7 +121,7 @@ resource "aws_iam_role_policy" "ecs_task_role_policy" {
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
-  policy = jsonencode(var.task_role)
+  policy = "${jsonencode(var.task_role)}"
 }
 
 # Create Task Definition
