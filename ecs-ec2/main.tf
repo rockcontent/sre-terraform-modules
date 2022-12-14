@@ -38,27 +38,6 @@ EOF
 #         Security          #
 #############################
 
-# Traffic to the ECS Cluster should only come from the ALB
-#resource "aws_security_group" "main" {
-#  name        = "${var.project}-task"
-#  description = "allow inbound access from the ALB only"
-#  vpc_id      = var.vpc
-
-#  ingress {
-#    protocol        = "tcp"
-#    from_port       = var.app_port
-#    to_port         = var.app_port
-#    security_groups = ["${var.securitygroup}"]
-#  }
-
-#  egress {
-#    protocol    = "-1"
-#    from_port   = 0
-#    to_port     = 0
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#}
-
 # Create Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_exec_role" {
   name               = "ECSTaskExecRole-${var.project}"
