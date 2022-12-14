@@ -35,7 +35,6 @@ module "ecs-module" {
                             ]
   publicip                = var.PUBLICIP
   vpc                     = var.VPC
-  # securitygroup           = var.SECURITYGROUP
   logsretention           = var.LOGSRETENTION
   ecrretention            = var.ECRRETENTION
   type_compatibility      = var.TYPE_COMPATIBILITY
