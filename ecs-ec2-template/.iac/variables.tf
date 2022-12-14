@@ -105,9 +105,9 @@ variable "LOADBALANCER" {
   type = string
 }
 
-variable "SECURITYGROUP" {
-  type = string
-}
+# variable "SECURITYGROUP" {
+#   type = string
+# }
 
 variable "SUBNET1" {
   type = string

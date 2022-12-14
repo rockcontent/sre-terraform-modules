@@ -71,10 +71,10 @@ variable "vpc" {
   description = "VPC ID used in Tasks"
 }
 
-variable "securitygroup" {
-  type        = string
-  description = "SG used in Tasks"
-}
+# variable "securitygroup" {
+#   type        = string
+#   description = "SG used in Tasks"
+# }
 
 variable "logsretention" {
   type        = number
