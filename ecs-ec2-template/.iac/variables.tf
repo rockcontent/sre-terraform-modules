@@ -16,15 +16,6 @@ variable "AWS_SECRET_KEY" {
   type = string
 }
 
-variable "ENVIRONMENT_FILE" {
-  type = string
-}
-
-variable "SECRETS_FILE" {
-  type = string
-}
-
-
 variable "AWS_REGION" {
   type = string
 }

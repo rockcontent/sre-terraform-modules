@@ -1,6 +1,14 @@
 name: 'IAC Terraform'
 
-on: [workflow_dispatch]
+on:
+  push:
+    paths:
+      - '.iac/**'
+      - '.github/workflows/iac-**'
+    branches:
+      - 'master'
+      - 'stage' 
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -9,7 +17,6 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    
     defaults:
       run:
         shell: bash
@@ -43,6 +50,7 @@ jobs:
         oldIFS="$IFS"
         IFS='
         '
+        
         if [ ${{ github.ref_name }} == "master" ]; then
 
           #TERRAFORM ENVIRONMENTS VARIABLES
@@ -75,12 +83,42 @@ jobs:
           echo TF_VAR_AWS_SECRET_KEY=${{ secrets.STUDIO_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
           echo AWS_ACCESS_KEY=${{ secrets.STUDIO_PROD_AWS_ACCESS_KEY }} >> $GITHUB_ENV
           echo AWS_SECRET_KEY=${{ secrets.STUDIO_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
+        fi
 
-        else
 
-          for i in `cat *dev.var`; do
+
+        if [ ${{ github.ref_name }} == "stage" ]; then
+
+          #TERRAFORM ENVIRONMENTS VARIABLES
+          for i in `cat *stage.var`; do
               echo "$i" >> $GITHUB_ENV
           done
+
+          #TASK ENVIRONMENT VARIABLES
+          echo 'TF_VAR_ENVIRONMENTVAR<<EOF' >> $GITHUB_ENV
+          echo '[' >> $GITHUB_ENV
+          for i in `cat stage.env`; do 
+            echo $i | awk -F= '{print "{"; print "\t\"name\" = " $1"," ; print "\t\"value\" = " $2 ; print "}," }' >> $GITHUB_ENV
+          done
+          #echo '{}' >> $GITHUB_ENV
+          echo ']' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          # TASK ENVIRONMENT SECRETS
+          echo 'TF_VAR_SECRETSVAR<<EOF' >> $GITHUB_ENV
+          echo '[' >> $GITHUB_ENV
+          for i in `cat stage.secrets`; do 
+             echo $i | awk -F= '{print "{"; print "\t\"name\" = " $1"," ; print "\t\"valueFrom\" = " $2 ; print "}," }' >> $GITHUB_ENV
+          done
+          #echo '{}' >> $GITHUB_ENV
+          echo ']' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          # AWS SECRET VARIABLES
+          echo TF_VAR_AWS_ACCESS_KEY=${{ secrets.STUDIO_STAGE_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo TF_VAR_AWS_SECRET_KEY=${{ secrets.STUDIO_STAGE_AWS_SECRET_KEY }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY=${{ secrets.STUDIO_STAGE_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo AWS_SECRET_KEY=${{ secrets.STUDIO_STAGE_AWS_SECRET_KEY }} >> $GITHUB_ENV
         fi
 
     - name: Terraform Init Dev

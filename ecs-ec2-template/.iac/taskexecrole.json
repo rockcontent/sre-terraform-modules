@@ -11,7 +11,7 @@
               "secretsmanager:ListSecretVersionIds",
               "secretsmanager:TagResource"
           ],
-          "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:*-studio-feature-service*"
+          "Resource": "arn:aws:secretsmanager:us-east-1:*:secret:*studio-feature-service*"
       },
       {
           "Sid": "VisualEditor1",
