@@ -1,13 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-  version = "<= 3.74.3"
-}
-
-terraform {
-  backend "s3" {}
-}
-
-
 variable "AWS_ACCESS_KEY" {
   type = string
 }
@@ -96,25 +86,9 @@ variable "LOADBALANCER" {
   type = string
 }
 
-variable "SUBNET1" {
-  type = string
-}
-
-
-variable "SUBNET2" {
-  type = string
-}
-
-
 variable "VPC" {
   type = string
 }
-
-
-variable "PUBLICIP" {
-  type = string
-}
-
 
 variable "LOGSRETENTION" {
   type = string
@@ -126,29 +100,11 @@ variable "ECRRETENTION" {
 }
 
 
-variable "TYPE_COMPATIBILITY" {
-  type = string
-}
-
-
-variable "TAG_ENVIRONMENT" {
-  type = string
-}
-
-variable "TAG_TRIBE" {
-  type = string
-}
-
-variable "PRODUCT" {
-  type = string
+variable "TAGS" {
+  type = map(string)
 }
 
 variable "environment" {
-  type = string
-  default = null
-}
-
-variable "secrets" {
   type = string
   default = null
 }
@@ -160,4 +116,10 @@ variable "ENVIRONMENTVAR" {
 variable "SECRETSVAR" {
   type = list(any)
   default = []
+}
+variable "TASKROLE" {
+  type = string
+}
+variable "TASKEXECROLE" {
+  type = string
 }

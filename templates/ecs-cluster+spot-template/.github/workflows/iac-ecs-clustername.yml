@@ -1,0 +1,93 @@
+name: 'IAC Terraform'
+
+on:
+  push:
+    paths:
+      - '.iac/**'
+      - '.github/workflows/iac-**'
+    branches:
+      - 'master'
+      - 'stage' 
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Clone terraform-modules
+      uses: actions/checkout@v3
+      with:
+        repository: grupomytec/terraform-modules
+        path: .iac/terraform
+        ref: main
+
+    - name: Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Variables run
+      run: | 
+        cd .iac
+        oldIFS="$IFS"
+        IFS='
+        '
+        
+        if [ ${{ github.ref_name }} == "prod" ]; then
+          branchdir=prod
+          echo branchdir=$branchdir >> $GITHUB_ENV
+          # AWS SECRET VARIABLES
+          echo TF_VAR_AWS_ACCESS_KEY=${{ secrets.AWSACCOUNT_PROD_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo TF_VAR_AWS_SECRET_KEY=${{ secrets.AWSACCOUNT_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY=${{ secrets.AWSACCOUNT_PROD_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo AWS_SECRET_KEY=${{ secrets.AWSACCOUNT_PROD_AWS_SECRET_KEY }} >> $GITHUB_ENV
+        fi
+        if [ ${{ github.ref_name }} == "stage" ]; then
+          branchdir=stage
+          echo branchdir=$branchdir >> $GITHUB_ENV
+          # AWS SECRET VARIABLES
+          echo TF_VAR_AWS_ACCESS_KEY=${{ secrets.AWSACCOUNT_STAGE_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo TF_VAR_AWS_SECRET_KEY=${{ secrets.AWSACCOUNT_STAGE_AWS_SECRET_KEY }} >> $GITHUB_ENV
+          echo AWS_ACCESS_KEY=${{ secrets.AWSACCOUNT_STAGE_AWS_ACCESS_KEY }} >> $GITHUB_ENV
+          echo AWS_SECRET_KEY=${{ secrets.AWSACCOUNT_STAGE_AWS_SECRET_KEY }} >> $GITHUB_ENV
+        fi
+
+        # TERRAFORM ENVIRONMENTS VARIABLES
+        for i in `cat ./$branchdir/*.var`; do
+          if [[ $i != \#* ]]; then
+            echo "$i" >> $GITHUB_ENV
+          fi
+        done
+      
+        # TAGS VARIABLES
+        echo 'TF_VAR_TAGS<<EOF' >> $GITHUB_ENV
+        echo '{' >> $GITHUB_ENV
+        for i in `cat ./$branchdir/*.tags`; do
+          if [[ $i != \#* ]]; then
+            echo "$i" >> $GITHUB_ENV
+          fi
+        done
+        echo '}' >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Terraform Init Dev
+      run: |
+        cd .iac
+        terraform --version
+        terraform init \
+          --backend-config="key=${{ github.event.repository.name }}-${{ github.ref_name }}/terraform.tfstate" \
+          --backend-config="bucket=$TFBUCKETSTATE" \
+          --backend-config="region=$AWS_REGION"
+        terraform validate
+        terraform plan -out=tfplanfile
+        terraform apply -input=false "tfplanfile"

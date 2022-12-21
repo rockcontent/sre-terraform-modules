@@ -1,7 +1,7 @@
 variable "tags" {
-  type        = map(any)
+  type        = map(string)
   description = "Tags"
-  default     = {}
+  default     = null
 }
 
 variable "task_environment" {
@@ -18,11 +18,11 @@ variable "task_secrets" {
 
 variable "task_role" {
   type        = string
-  description = "Task environment variables"
+  description = "Task role"
 }
 variable "task_exec_role" {
   type        = string
-  description = "Task environment variables"
+  description = "Task exec role"
 }
 
 
@@ -51,15 +51,6 @@ variable "loadbalancer" {
   description = "Loadbalancer listener of the task"
 }
 
-variable "subnets" {
-  type        = list(any)
-  description = "Subnet 1 of the task"
-}
-
-variable "publicip" {
-  type        = string
-  description = "Assign public IP  1 of the task"
-}
 
 variable "region" {
   type        = string
@@ -140,11 +131,6 @@ variable "tg-healthy_threshold" {
 variable "tg-unhealthy_threshold" {
   type        = number
   description = "Unhealthy Threshold HealthCheck"
-}
-
-variable "type_compatibility" {
-  type        = string
-  description = "Type Compatibility EC2, FARGATE and EXTERNAL"
 }
 
 variable "cluster_name" {

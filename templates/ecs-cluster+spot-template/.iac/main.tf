@@ -1,3 +1,12 @@
+provider "aws" {
+  region = "us-east-1"
+  version = "<= 3.74.3"
+}
+
+terraform {
+  backend "s3" {}
+}
+
 module "ecs-module" {
   source                  = "./terraform/ecs-ec2"
   project                 = var.PROJECT
@@ -21,31 +30,16 @@ module "ecs-module" {
   tg-unhealthy_threshold  = var.UNHEALTHY_THRESHOLD
   task_secrets            = var.SECRETSVAR
   task_environment        = var.ENVIRONMENTVAR
-  task_role               = "${file("taskrole.json")}"
-  task_exec_role          = "${file("taskexecrole.json")}"
+  task_role               = var.TASKROLE
+  task_exec_role          = var.TASKEXECROLE
   #############################
   #      AWS environment      #
   #############################
   accountid               = var.AWS_ACCOUNT_ID
   region                  = var.AWS_REGION
   loadbalancer            = var.LOADBALANCER
-  subnets                 = [
-                              var.SUBNET1,
-                              var.SUBNET2
-                            ]
-  publicip                = var.PUBLICIP
   vpc                     = var.VPC
   logsretention           = var.LOGSRETENTION
   ecrretention            = var.ECRRETENTION
-  type_compatibility      = var.TYPE_COMPATIBILITY
-
-
-  tags = {
-    "branch"        = var.BRANCH
-    "project"       = var.PROJECT
-    "created_by"    = "terraform"
-    "tribe"         = var.TAG_TRIBE
-    "environment"   = var.TAG_ENVIRONMENT
-    "product"       = var.PRODUCT
-  }
+  tags                    = var.TAGS
 }

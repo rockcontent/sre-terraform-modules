@@ -161,13 +161,8 @@ resource "aws_ecs_service" "main" {
   cluster         = var.cluster_name
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.min_capacity
-  launch_type     = var.type_compatibility
+  launch_type     = "EC2"
 
-#  network_configuration {
-#    security_groups  = [aws_security_group.main.id]
-#    subnets          = var.subnets
-#    assign_public_ip = var.publicip
-#  }
 
   load_balancer {
     target_group_arn = aws_alb_target_group.main.id
